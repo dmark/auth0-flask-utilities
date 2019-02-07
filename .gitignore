@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# local ignores
+.env*
+bin/
+include/
+pip-selfcheck.json
+

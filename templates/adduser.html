@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Add New User</h1>
+    <p>
+        This form will add a new user to our external user database. If
+        you are unsure whether this is what you want to do, please
+        contact Mark Drummond.
+    </p>
+    {% import "bootstrap/wtf.html" as wtf %}
+    {{ wtf.quick_form(form) }}
+</div>
+{% endblock %}

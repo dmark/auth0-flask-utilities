@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Get User</h1>
+    <p>Provide an email address <b>or</b> a username:</p>
+    {% import "bootstrap/wtf.html" as wtf %}
+    {{ wtf.quick_form(form) }}
+</div>
+{% endblock %}
