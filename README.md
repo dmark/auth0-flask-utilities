@@ -8,4 +8,4 @@ Flask-based utilities for interfacing with the Auth0 Management API
 - Extend the app to search for and edit users stored in an Auth0 hosted user
   data repository.
 
-![alt text](auth0-flask-utilities/screenshots/Screenshot 2019-02-06 20.56.52.png "Auth0 User Manager")
+![Auth0 User Manager](https://github.com/dmark/auth0-flask-utilities/blob/master/screenshots/Screenshot%202019-02-06%2020.56.52.png "Auth0 User Manager")
