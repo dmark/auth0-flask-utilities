@@ -108,4 +108,4 @@ venv.bak/
 bin/
 include/
 pip-selfcheck.json
-
+.DS_Store
