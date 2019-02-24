@@ -17,8 +17,11 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/user/add">Add User</a></li>
-                <li><a href="/user/get">Get User</a></li>
+                <li><a href="{{ url_for('user_add') }}">Add User</a></li>
+                <li><a href="{{ url_for('user_get') }}">Get User</a></li>
+                {% if session['jwt_payload'] %}
+                <li><a href="/user_id/{{ session['jwt_payload']['sub'] }}">My Profile</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

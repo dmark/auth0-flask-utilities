@@ -13,14 +13,12 @@ from flask import session
 from flask import url_for
 
 from flask_bootstrap import Bootstrap
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
 
 from authlib.flask.client import OAuth
 from six.moves.urllib.parse import urlencode
 
 import constants
+import user_manager.forms as forms
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -59,20 +57,6 @@ auth0 = oauth.register(
         'scope': 'openid profile email',
     },
 )
-
-
-class NewUserForm(FlaskForm):
-    given_name = StringField('Given Name', validators=[DataRequired()])
-    family_name = StringField('Family Name', validators=[DataRequired()])
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    submit = SubmitField('Add')
-
-
-class GetUserForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    submit = SubmitField('Get')
 
 
 def requires_auth(f):
@@ -130,20 +114,32 @@ def profile(user_id):
     """ Use this to display user user_id's profile. This can be called as a
     function like so: url_for('profile', user_id=userinfo['sub'])
     """
-    return render_template('profile.html', user_id=userinfo['user_id'])
+    form = forms.ProfileForm(email=session['jwt_payload']['email'],
+                             email_verified=session['jwt_payload']['email_verified'],
+                             user_id=session['jwt_payload']['sub'],
+                             name=session['jwt_payload']['name'],
+                             nickname=session['jwt_payload']['nickname']
+                             )
+    return render_template('profile.html',
+                           email=user_id,
+                           userinfo=session[constants.PROFILE_KEY],
+                           jwt_payload=session[constants.JWT_PAYLOAD],
+                           userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD],
+                                                      indent=4),
+                           form=form)
 
 
 @app.route('/user/add', methods=['GET', 'POST'])
 @requires_auth
 def user_add():
-    form = NewUserForm()
+    form = forms.NewUserForm()
     return render_template('adduser.html', form=form)
 
 
 @app.route('/user/get', methods=['GET', 'POST'])
 @requires_auth
 def user_get():
-    form = GetUserForm()
+    form = forms.GetUserForm()
     return render_template('getuser.html', form=form)
 
 

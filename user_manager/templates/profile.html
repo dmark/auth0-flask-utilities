@@ -5,13 +5,18 @@
         <div class="container">
             <div class="login-page clearfix">
                 <div class="logged-in-box auth0-box logged-in">
-                    {% if session %}
+                    {% if session['jwt_payload'] %}
                         <h1>Welcome, {{ jwt_payload['nickname']|capitalize }}</h1>
                         <hr/>
+                        <pre>{{userinfo_pretty}}</pre>
                     {% endif %}
-                    <a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout btn-block" href="/logout">Logout</a>
+                    {% import "bootstrap/wtf.html" as wtf %}
+                    {{ wtf.quick_form(form) }}                
                 </div>
             </div>
         </div>
-  </div>
+        <hr/>
+        <p> {{ request }} </p>
+        <p> {{ session }} </p>
+    </div>
 {% endblock %}
