@@ -125,6 +125,7 @@ def logout():
 
 
 @app.route('/user_id/<user_id>')
+@requires_auth
 def profile(user_id):
     """ Use this to display user user_id's profile. This can be called as a
     function like so: url_for('profile', user_id=userinfo['sub'])
@@ -147,16 +148,19 @@ def user_get():
 
 
 @app.errorhandler(404)
+@requires_auth
 def page_not_found(e):
     return render_template('404.html'), 404
 
 
 @app.errorhandler(500)
+@requires_auth
 def internal_server_error(e):
     return render_template('500.html'), 500
 
 
 @app.errorhandler(Exception)
+@requires_auth
 def handle_auth_error(ex):
     response = jsonify(message=str(ex))
     response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
