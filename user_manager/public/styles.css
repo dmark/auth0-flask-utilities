@@ -1,11 +1,11 @@
 body {
   font-family: "proxima-nova", sans-serif;
-  text-align: center;
-  font-size: 300%;
+  text-align: left;
   font-weight: 100;
 }
 pre {
   text-align: left;
+  white-space: pre-wrap;       /* Since CSS 2.1 */
 }
 input[type=checkbox],
 input[type=radio] {

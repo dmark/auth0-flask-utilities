@@ -72,11 +72,8 @@ def requires_auth(f):
 @app.route('/')
 @requires_auth
 def home():
-    return render_template('index.html',
-                           userinfo=session[constants.PROFILE_KEY],
-                           jwt_payload=session[constants.JWT_PAYLOAD],
-                           userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD],
-                                                      indent=4))
+    # Display the logged in user's profile by default
+    return redirect(url_for('profile', user_id=session['jwt_payload']['sub']))
 
 
 @app.route('/callback')
@@ -112,7 +109,7 @@ def logout():
 @requires_auth
 def profile(user_id):
     """ Use this to display user user_id's profile. This can be called as a
-    function like so: url_for('profile', user_id=userinfo['sub'])
+    function like so: url_for('profile', user_id=session['jwt_payload']['sub'])
     """
     form = forms.ProfileForm(email=session['jwt_payload']['email'],
                              email_verified=session['jwt_payload']['email_verified'],
@@ -121,9 +118,6 @@ def profile(user_id):
                              nickname=session['jwt_payload']['nickname']
                              )
     return render_template('profile.html',
-                           email=user_id,
-                           userinfo=session[constants.PROFILE_KEY],
-                           jwt_payload=session[constants.JWT_PAYLOAD],
                            userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD],
                                                       indent=4),
                            form=form)
@@ -164,5 +158,4 @@ def handle_auth_error(ex):
 
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=env.get('PORT', 5000), debug=True)
     app.run(debug=True)

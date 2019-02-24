@@ -8,13 +8,13 @@ class NewUserForm(FlaskForm):
     family_name = StringField('Family Name', validators=[DataRequired()])
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[Email()])
-    submit = SubmitField('Add')
+    submit = SubmitField('Add User')
 
 
 class GetUserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
-    submit = SubmitField('Get')
+    submit = SubmitField('Get User')
 
 
 class ProfileForm(FlaskForm):
@@ -33,4 +33,4 @@ class ProfileForm(FlaskForm):
     blocked_for = StringField('Blocked IP Addresses', validators=[DataRequired()])
     guardian_authenticators = StringField('MFA', validators=[DataRequired()])
 
-    submit = SubmitField('Submit')
+    submit = SubmitField('Update User')
