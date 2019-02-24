@@ -2,5 +2,13 @@
 
 {% block page_content %}
 <div class="page-header">
+    {% if session %}
+        Hello, {{ session['jwt_payload']['nickname']|capitalize }}
+    {% else %}
+        Hello, no session
+    {% endif %}
+    <hr/>
+    <p> {{ request }} </p>
+    <p> {{ session }} </p>
 </div>
 {% endblock %}

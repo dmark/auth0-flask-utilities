@@ -56,11 +56,11 @@ def create_app():
     Bootstrap(app)
     return app
 
-
 app = create_app()
-app.config['SECRET_KEY'] = '03e930e7090ea7f0096881067415f9f7'
-app.secret_key = constants.SECRET_KEY
+app.config['SECRET_KEY'] = env.get(constants.SECRET_KEY)
+app.secret_key = env.get(constants.SECRET_KEY)
 app.debug = True
+
 
 oauth = OAuth(app)
 auth0 = oauth.register(
@@ -71,7 +71,7 @@ auth0 = oauth.register(
     access_token_url=AUTH0_BASE_URL + '/oauth/token',
     authorize_url=AUTH0_BASE_URL + '/authorize',
     client_kwargs={
-        'scope': 'openid profile',
+        'scope': 'openid profile email',
     },
 )
 
@@ -87,8 +87,8 @@ def requires_auth(f):
 
 
 @app.route('/')
+@requires_auth
 def home():
-    print(app.url_map)
     return render_template('index.html')
 
 
@@ -110,7 +110,7 @@ def callback_handling():
         'name': userinfo['name'],
         'picture': userinfo['picture']
     }
-    return redirect('/dashboard')
+    return redirect('/')
 
 
 @app.route('/login')
@@ -122,7 +122,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    params = {'returnTo': url_for('index', _external=True),
+    params = {'returnTo': url_for('home', _external=True),
               'client_id': AUTH0_CLIENT_ID}
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
@@ -147,7 +147,7 @@ def profile(user_id):
     """ Use this to display user user_id's profile. This can be called as a
     function like so: url_for('profile', user_id=userinfo['sub'])
     """
-    return '<h1>Profile for %s</h1>' % user_id
+    return render_template('profile.html', user_id=userinfo['user_id'])
 
 
 @app.route('/user/add', methods=['GET', 'POST'])
