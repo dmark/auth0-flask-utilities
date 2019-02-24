@@ -2,7 +2,6 @@ from functools import wraps
 import json
 from os import environ as env
 from werkzeug.exceptions import HTTPException
-
 from dotenv import load_dotenv, find_dotenv
 
 from flask import Flask
@@ -37,30 +36,16 @@ if AUTH0_AUDIENCE is '':
     AUTH0_AUDIENCE = AUTH0_BASE_URL + '/userinfo'
 
 
-class NewUserForm(FlaskForm):
-    given_name = StringField('Given Name', validators=[DataRequired()])
-    family_name = StringField('Family Name', validators=[DataRequired()])
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    submit = SubmitField('Add')
-
-
-class GetUserForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired()])
-    submit = SubmitField('Get')
-
-
 def create_app():
     app = Flask(__name__, static_url_path='/public', static_folder='./public')
+    app.config['SECRET_KEY'] = env.get(constants.SECRET_KEY)
+    app.debug = True
+
     Bootstrap(app)
+
     return app
 
 app = create_app()
-app.config['SECRET_KEY'] = env.get(constants.SECRET_KEY)
-app.secret_key = env.get(constants.SECRET_KEY)
-app.debug = True
-
 
 oauth = OAuth(app)
 auth0 = oauth.register(
@@ -76,6 +61,20 @@ auth0 = oauth.register(
 )
 
 
+class NewUserForm(FlaskForm):
+    given_name = StringField('Given Name', validators=[DataRequired()])
+    family_name = StringField('Family Name', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
+    submit = SubmitField('Add')
+
+
+class GetUserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
+    submit = SubmitField('Get')
+
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -89,13 +88,11 @@ def requires_auth(f):
 @app.route('/')
 @requires_auth
 def home():
-    return render_template('index.html')
-
-
-@app.route('/user-agent')
-def user_agent():
-    user_agent = request.headers.get('User-Agent')
-    return '<p>Your browser is %s</p>' % user_agent
+    return render_template('index.html',
+                           userinfo=session[constants.PROFILE_KEY],
+                           jwt_payload=session[constants.JWT_PAYLOAD],
+                           userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD],
+                                                      indent=4))
 
 
 @app.route('/callback')
@@ -125,21 +122,6 @@ def logout():
     params = {'returnTo': url_for('home', _external=True),
               'client_id': AUTH0_CLIENT_ID}
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
-
-
-@app.route('/dashboard')
-@requires_auth
-def dashboard():
-    return render_template('dashboard.html',
-                           userinfo=session[constants.PROFILE_KEY],
-                           userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD],
-                                                      indent=4))
-
-
-@app.route('/user')
-@requires_auth
-def user(name):
-    return render_template('user.html')
 
 
 @app.route('/user_id/<user_id>')
